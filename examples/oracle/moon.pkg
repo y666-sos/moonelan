@@ -1,0 +1,6 @@
+import {
+  "y666-sos/moonelan" @eaf,
+  "y666-sos/moonelan/examples/fixture",
+}
+
+pkgtype(kind: "executable")
