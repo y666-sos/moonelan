@@ -10,6 +10,7 @@ test "CSV quotes multiline comma and quote payloads and JSON preserves paths" {
   guard rows[1] is Object(second) else { fail("row object") }
   let null_value : Json = null
   assert_eq(first.get("parent"), Some(null_value))
+  assert_eq(second.get("parent"), Some(@json.to_json("a1")))
   assert_eq(second.get("path"), Some(@json.to_json(["a1", "a2"])))
   assert_eq(second.get("value"), Some(@json.to_json("a,\"b\"\n中")))
 }

@@ -9,7 +9,9 @@ fn main raise {
     let d = @eaf.resample(d, 3, 2, offset=seed)
     let d = @eaf.parse(@eaf.write(d))
     println(@eaf.write(d))
+    println("MOONELAN_XML_END")
     println(@eaf.to_json(d))
+    println("MOONELAN_JSON_END")
     // CSV may contain real newlines, delimit with an explicit marker.
     println(@eaf.to_csv(d))
     println("MOONELAN_CASE_END")

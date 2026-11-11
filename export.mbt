@@ -40,7 +40,13 @@ pub fn to_json(d : Document) -> String raise EafError {
         ("tier", @json.to_json(r.tier)),
         ("participant", @json.to_json(r.participant)),
         ("id", @json.to_json(r.id)),
-        ("parent", @json.to_json(r.parent)),
+        (
+          "parent",
+          match r.parent {
+            Some(p) => @json.to_json(p)
+            None => null
+          },
+        ),
         ("root", @json.to_json(r.root)),
         ("path", @json.to_json(r.path)),
         ("start_ms", @json.to_json(r.span.start)),

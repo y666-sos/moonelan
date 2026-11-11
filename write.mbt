@@ -16,6 +16,11 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
     ("DATE", d.date),
     ("FORMAT", d.version),
     ("VERSION", d.version),
+    ("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+    (
+      "xsi:noNamespaceSchemaLocation",
+      "http://www.mpi.nl/tools/elan/EAFv" + d.version + ".xsd",
+    ),
   ])
   w.start_element("HEADER", [("MEDIA_FILE", ""), ("TIME_UNITS", "milliseconds")])
   for m in d.media {
