@@ -10,7 +10,10 @@ priv struct GraphIndex {
 ///|
 /// Index construction also verifies identifiers, cardinalities and tier DAGs.
 fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
-  guard limits.tiers > 0 && limits.annotations > 0 && limits.depth > 0 else {
+  guard limits.tiers > 0 &&
+    limits.annotations > 0 &&
+    limits.annotations <= 1000000 &&
+    limits.depth > 0 else {
     raise Budget("invalid structural limits")
   }
   guard d.tiers.length() <= limits.tiers && d.types.length() <= limits.tiers else {
@@ -21,6 +24,12 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
   }
   guard d.version == "2.8" || d.version == "3.0" else {
     raise Unsupported("EAF version")
+  }
+  validate_metadata(d)
+  let xml_ids : Map[String, Bool] = Map([])
+  for
+    c in [TimeSubdivision, IncludedIn, SymbolicAssociation, SymbolicSubdivision] {
+    xml_ids[constraint_name(c)] = true
   }
   let tiers : Map[String, Int32] = Map([])
   let types : Map[String, Constraint] = Map([])
@@ -34,7 +43,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
     types[t.id] = t.constraint
   }
   for s in d.times {
-    validate_identifier(s.id)
+    validate_xml_id(s.id)
+    guard !xml_ids.contains(s.id) else { raise Invalid("XML ID collision") }
+    xml_ids[s.id] = true
     guard s.milliseconds >= 0 else { raise Invalid("negative time slot") }
     guard !times.contains(s.id) else { raise Invalid("duplicate time slot") }
     times[s.id] = s.milliseconds
@@ -53,7 +64,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
     }
     for j, a in t.annotations {
       let id = annotation_id(a)
-      validate_identifier(id)
+      validate_xml_id(id)
+      guard !xml_ids.contains(id) else { raise Invalid("XML ID collision") }
+      xml_ids[id] = true
       guard !annotations.contains(id) else {
         raise Invalid("duplicate annotation")
       }

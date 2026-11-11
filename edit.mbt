@@ -94,5 +94,6 @@ pub fn set_value(
     Aligned(id, lo, hi, _) => Aligned(id, lo, hi, value)
     Reference(id, target, previous, _) => Reference(id, target, previous, value)
   }
+  validate(result)
   result
 }
