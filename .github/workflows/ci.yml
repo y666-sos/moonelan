@@ -31,6 +31,7 @@ jobs:
       - name: Inspect sources and generated interfaces
         run: |
           moon version --all
+          moon update
           moon info
           moon fmt --check
           git diff --exit-code
