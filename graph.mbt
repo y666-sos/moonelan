@@ -1,10 +1,10 @@
 ///|
 priv struct GraphIndex {
-  tiers : Map[String, Int]
+  tiers : Map[String, Int32]
   types : Map[String, Constraint]
-  times : Map[String, Int]
-  annotations : Map[String, (Int, Int)]
-  order : Array[Int]
+  times : Map[String, Int32]
+  annotations : Map[String, (Int32, Int32)]
+  order : Array[Int32]
 }
 
 ///|
@@ -22,10 +22,10 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
   guard d.version == "2.8" || d.version == "3.0" else {
     raise Unsupported("EAF version")
   }
-  let tiers : Map[String, Int] = Map([])
+  let tiers : Map[String, Int32] = Map([])
   let types : Map[String, Constraint] = Map([])
-  let times : Map[String, Int] = Map([])
-  let annotations : Map[String, (Int, Int)] = Map([])
+  let times : Map[String, Int32] = Map([])
+  let annotations : Map[String, (Int32, Int32)] = Map([])
   for t in d.types {
     validate_identifier(t.id)
     guard !types.contains(t.id) else {
@@ -114,9 +114,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
     }
   }
   // Kahn ordering avoids recursion and detects parent-tier cycles.
-  let order : Array[Int] = []
+  let order : Array[Int32] = []
   let done : Map[String, Bool] = Map([])
-  let depths : Map[String, Int] = Map([])
+  let depths : Map[String, Int32] = Map([])
   while order.length() < d.tiers.length() {
     let before = order.length()
     for i, t in d.tiers {
@@ -149,7 +149,7 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
 /// Structural validation is useful before temporal policy checks.
 pub fn validate_structure(
   d : Document,
-  limits? : Limits = default_limits(),
+  limits~ : Limits = default_limits(),
 ) -> Unit raise EafError {
   let ix = graph_index(d, limits)
   ignore(ix.tiers.length())

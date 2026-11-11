@@ -27,7 +27,7 @@ pub(all) struct LinguisticType {
 /// Times are integer milliseconds, bounded by the positive Int range.
 pub(all) struct TimeSlot {
   id : String
-  milliseconds : Int
+  milliseconds : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -52,7 +52,7 @@ pub(all) struct Media {
   url : String
   relative_url : String
   mime_type : String
-  time_origin : Int
+  time_origin : Int32
 } derive(Debug, Eq)
 
 ///|
@@ -70,11 +70,11 @@ pub(all) struct Document {
 
 ///|
 pub(all) struct Limits {
-  input_units : Int
-  nodes : Int
-  depth : Int
-  tiers : Int
-  annotations : Int
+  input_units : Int32
+  nodes : Int32
+  depth : Int32
+  tiers : Int32
+  annotations : Int32
 } derive(Debug, Eq)
 
 ///|

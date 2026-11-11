@@ -95,7 +95,7 @@ fn symbolic_groups(
 /// Full semantic validation, including all dependent tier constraints.
 pub fn validate(
   d : Document,
-  limits? : Limits = default_limits(),
+  limits~ : Limits = default_limits(),
 ) -> Unit raise EafError {
   let ix = graph_index(d, limits)
   ignore(temporal_parents(d, ix, resolved_spans(d, ix)))
