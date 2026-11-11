@@ -136,6 +136,9 @@ fn validate_metadata(d : Document) -> Unit raise EafError {
     xml_text(name)
     xml_text(value)
   }
+  for t in d.types {
+    xml_text(t.id)
+  }
   for t in d.tiers {
     xml_text(t.id)
     xml_text(t.linguistic_type)

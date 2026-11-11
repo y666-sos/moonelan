@@ -59,7 +59,8 @@ fn xml_tree(text : String, limits : Limits) -> XmlNode raise EafError {
         if ev.kind is @xml.Start(_) {
           stack.push(n)
         }
-        guard stack.length() <= limits.depth else {
+        guard stack.length() + (if ev.kind is @xml.Empty(_) { 1 } else { 0 }) <=
+          limits.depth else {
           raise Budget("XML nesting too deep")
         }
       }
