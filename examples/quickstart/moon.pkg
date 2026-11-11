@@ -1,0 +1,5 @@
+import {
+  "y666-sos/moonelan" @eaf,
+}
+
+pkgtype(kind: "executable")

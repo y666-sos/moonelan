@@ -40,6 +40,7 @@ jobs:
           moon check --deny-warn --target ${{ matrix.target }}
           moon test --deny-warn --target ${{ matrix.target }}
           moon build --deny-warn --target ${{ matrix.target }}
+          moon run examples/quickstart --target ${{ matrix.target }}
           moon run examples/curate --target ${{ matrix.target }}
           moon run examples/edit --target ${{ matrix.target }}
           moon run examples/dataset --target ${{ matrix.target }}
