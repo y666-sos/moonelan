@@ -1,0 +1,202 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "y666-sos/moonelan"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn add_tier(Document, Tier, Constraint, times? : Array[TimeSlot]) -> Document raise EafError
+
+pub fn annotation_id(Annotation) -> String
+
+pub fn annotation_value(Annotation) -> String
+
+pub fn annotations_between(Document, String, Int, Int) -> Array[Annotation] raise EafError
+
+pub fn children(Document, String, String) -> Array[Annotation] raise EafError
+
+pub fn compact(Document) -> Document raise EafError
+
+pub fn constraint_name(Constraint) -> String
+
+pub fn corpus_rows(Document) -> Array[CorpusRow] raise EafError
+
+pub fn default_limits() -> Limits
+
+pub fn empty_document() -> Document
+
+pub fn extract_roots(Document, Array[String]) -> Document raise EafError
+
+pub fn insert_reference(Document, String, String, String, String, after? : String?) -> Document raise EafError
+
+pub fn is_eaf_xml(String) -> Bool
+
+pub fn is_time_alignable(Constraint) -> Bool
+
+pub fn parent_annotation(Document, String) -> String? raise EafError
+
+pub fn parse(String, limits? : Limits) -> Document raise EafError
+
+pub fn reference_path(Document, String) -> Array[String] raise EafError
+
+pub fn remove_annotation(Document, String, cascade? : Bool) -> Document raise EafError
+
+pub fn remove_tier(Document, String) -> Document raise EafError
+
+pub fn rename_annotation(Document, String, String) -> Document raise EafError
+
+pub fn rename_tier(Document, String, String) -> Document raise EafError
+
+pub fn replace_annotations(Document, String, Array[Annotation], times? : Array[TimeSlot]) -> Document raise EafError
+
+pub fn resample(Document, Int, Int, offset? : Int) -> Document raise EafError
+
+pub fn resolve(Document, String) -> Span raise EafError
+
+pub fn retime(Document, Array[TimeSlot]) -> Document raise EafError
+
+pub fn rows_between(Document, Int, Int) -> Array[CorpusRow] raise EafError
+
+pub fn select_tiers(Document, Array[String]) -> Document raise EafError
+
+pub fn set_value(Document, String, String) -> Document raise EafError
+
+pub fn snapshot(Document) -> Document
+
+pub fn tier_ancestors(Document, String) -> Array[String] raise EafError
+
+pub fn tier_order(Document) -> Array[String] raise EafError
+
+pub fn to_csv(Document) -> String raise EafError
+
+pub fn to_json(Document) -> String raise EafError
+
+pub fn validate(Document, limits? : Limits) -> Unit raise EafError
+
+pub fn validate_identifier(String) -> Unit raise EafError
+
+pub fn validate_structure(Document, limits? : Limits) -> Unit raise EafError
+
+pub fn validate_temporal(Document) -> Unit raise EafError
+
+pub fn write(Document) -> String raise EafError
+
+// Errors
+pub(all) suberror EafError {
+  Invalid(String)
+  Unsupported(String)
+  Budget(String)
+  Xml(String)
+} derive(@debug.Debug)
+pub fn EafError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) enum Annotation {
+  Aligned(String, String, String, String)
+  Reference(String, String, String?, String)
+} derive(Eq, @debug.Debug)
+pub fn Annotation::equal(Self, Self) -> Bool
+pub fn Annotation::not_equal(Self, Self) -> Bool
+pub fn Annotation::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Constraint {
+  Independent
+  TimeSubdivision
+  IncludedIn
+  SymbolicAssociation
+  SymbolicSubdivision
+} derive(Eq, @debug.Debug)
+pub fn Constraint::equal(Self, Self) -> Bool
+pub fn Constraint::not_equal(Self, Self) -> Bool
+pub fn Constraint::to_repr(Self) -> @debug.Repr
+
+pub(all) struct CorpusRow {
+  tier : String
+  participant : String
+  id : String
+  parent : String?
+  root : String
+  path : Array[String]
+  span : Span
+  sibling_index : Int
+  value : String
+} derive(Eq, @debug.Debug)
+pub fn CorpusRow::equal(Self, Self) -> Bool
+pub fn CorpusRow::not_equal(Self, Self) -> Bool
+pub fn CorpusRow::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Document {
+  author : String
+  date : String
+  version : String
+  media : Array[Media]
+  properties : Array[(String, String)]
+  times : Array[TimeSlot]
+  types : Array[LinguisticType]
+  tiers : Array[Tier]
+} derive(Eq, @debug.Debug)
+pub fn Document::equal(Self, Self) -> Bool
+pub fn Document::not_equal(Self, Self) -> Bool
+pub fn Document::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Limits {
+  input_units : Int
+  nodes : Int
+  depth : Int
+  tiers : Int
+  annotations : Int
+} derive(Eq, @debug.Debug)
+pub fn Limits::equal(Self, Self) -> Bool
+pub fn Limits::not_equal(Self, Self) -> Bool
+pub fn Limits::to_repr(Self) -> @debug.Repr
+
+pub(all) struct LinguisticType {
+  id : String
+  constraint : Constraint
+} derive(Eq, @debug.Debug)
+pub fn LinguisticType::equal(Self, Self) -> Bool
+pub fn LinguisticType::not_equal(Self, Self) -> Bool
+pub fn LinguisticType::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Media {
+  url : String
+  relative_url : String
+  mime_type : String
+  time_origin : Int
+} derive(Eq, @debug.Debug)
+pub fn Media::equal(Self, Self) -> Bool
+pub fn Media::not_equal(Self, Self) -> Bool
+pub fn Media::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Span {
+  start : Int
+  end : Int
+} derive(Eq, @debug.Debug)
+pub fn Span::equal(Self, Self) -> Bool
+pub fn Span::not_equal(Self, Self) -> Bool
+pub fn Span::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Tier {
+  id : String
+  linguistic_type : String
+  parent : String?
+  participant : String
+  annotator : String
+  annotations : Array[Annotation]
+} derive(Eq, @debug.Debug)
+pub fn Tier::equal(Self, Self) -> Bool
+pub fn Tier::not_equal(Self, Self) -> Bool
+pub fn Tier::to_repr(Self) -> @debug.Repr
+
+pub(all) struct TimeSlot {
+  id : String
+  milliseconds : Int
+} derive(Eq, @debug.Debug)
+pub fn TimeSlot::equal(Self, Self) -> Bool
+pub fn TimeSlot::not_equal(Self, Self) -> Bool
+pub fn TimeSlot::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
