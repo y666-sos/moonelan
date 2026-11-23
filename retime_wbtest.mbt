@@ -29,10 +29,10 @@ test "shared anchor retiming adjusts both neighboring subdivisions" {
     Aligned(_, _, hi, _) => hi
     _ => ""
   }
-  let changed = retime(d, [{ id: boundary, milliseconds: 500, }])
+  let changed = retime(d, [{ id: boundary, milliseconds: Some(500), }])
   assert_eq(resolve(changed, "w1").end, 500)
   assert_eq(resolve(changed, "w2").start, 500)
-  try retime(d, [{ id: boundary, milliseconds: 1500, }]) catch {
+  try retime(d, [{ id: boundary, milliseconds: Some(1500), }]) catch {
     _ => ()
   } noraise {
     _ => fail("invalid parent coverage")

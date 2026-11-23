@@ -18,5 +18,5 @@ test "model snapshots own nested arrays" {
   assert_eq(d.tiers[0].annotations.length(), 0)
   assert_eq(annotation_id(c.tiers[0].annotations[0]), "a")
   assert_eq(constraint_name(SymbolicSubdivision), "Symbolic_Subdivision")
-  assert_true(!valid_id("bad id"))
+  assert_true(!valid_id("bad\nid"))
 }

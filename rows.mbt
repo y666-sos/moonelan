@@ -22,12 +22,55 @@ pub extend CorpusRow with Eq::{equal, not_equal}
 /// Produce topological tier rows, then parent groups and semantic sibling order.
 /// Symbolic subdivisions sharing a time interval remain separate ordered rows.
 pub fn corpus_rows(d : Document) -> Array[CorpusRow] raise EafError {
+  corpus_records(d).map(r => {
+    let (start, end) = match (r.timing.start_ms, r.timing.end_ms) {
+      (Some(start), Some(end)) => (start, end)
+      _ =>
+        raise Invalid("corpus_rows requires aligned times; use corpus_records")
+    }
+    CorpusRow::{
+      tier: r.tier,
+      participant: r.participant,
+      id: r.id,
+      parent: r.parent,
+      root: r.root,
+      path: r.path.copy(),
+      span: { start, end, },
+      sibling_index: r.sibling_index,
+      value: r.value,
+    }
+  })
+}
+
+///|
+/// A dataset record can retain real unaligned boundaries without guessing times.
+pub(all) struct CorpusRecord {
+  tier : String
+  participant : String
+  id : String
+  parent : String?
+  root : String
+  path : Array[String]
+  timing : Timing
+  cv_entry : String?
+  sibling_index : Int32
+  value : String
+} derive(Debug, Eq)
+
+///|
+pub extend CorpusRecord with @debug.Debug::{to_repr}
+
+///|
+pub extend CorpusRecord with Eq::{equal, not_equal}
+
+///|
+pub fn corpus_records(d : Document) -> Array[CorpusRecord] raise EafError {
   validate(d)
   let ix = graph_index(d, default_limits())
-  let spans = resolved_spans(d, ix)
+  let spans = structural_spans(d, ix)
   let parents = annotation_parents(d, ix)
   let paths : Map[String, Array[String]] = Map([])
-  let result : Array[CorpusRow] = []
+  let result : Array[CorpusRecord] = []
   for ti in ix.order {
     let t = d.tiers[ti]
     let c = ix.types.get(t.linguistic_type).unwrap()
@@ -76,7 +119,11 @@ pub fn corpus_rows(d : Document) -> Array[CorpusRow] raise EafError {
           parent,
           root: path[0],
           path: path.copy(),
-          span: spans.get(id).unwrap(),
+          timing: timing_from_index(d, ix, id),
+          cv_entry: attr(
+            object_attrs(d.extensions.annotation_attributes, id),
+            "CVE_REF",
+          ),
           sibling_index: index,
           value: annotation_value(a),
         })

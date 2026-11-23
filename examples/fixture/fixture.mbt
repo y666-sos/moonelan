@@ -19,11 +19,11 @@ pub fn corpus(seed : Int32) -> @eaf.Document raise @eaf.EafError {
     let g1 = "gstart" + suffix
     let g2 = "gend" + suffix
     let lo = offset + i * 1500
-    times.push({ id: start, milliseconds: lo, })
-    times.push({ id: mid, milliseconds: lo + 300 + seed % 100, })
-    times.push({ id: end, milliseconds: lo + 1000, })
-    times.push({ id: g1, milliseconds: lo + 100, })
-    times.push({ id: g2, milliseconds: lo + 200, })
+    times.push({ id: start, milliseconds: Some(lo), })
+    times.push({ id: mid, milliseconds: Some(lo + 300 + seed % 100), })
+    times.push({ id: end, milliseconds: Some(lo + 1000), })
+    times.push({ id: g1, milliseconds: Some(lo + 100), })
+    times.push({ id: g2, milliseconds: Some(lo + 200), })
     speech.push(
       @eaf.Aligned(a, start, end, "你好，世界 & \"语料\" \{seed}"),
     )
@@ -58,6 +58,7 @@ pub fn corpus(seed : Int32) -> @eaf.Document raise @eaf.EafError {
     }
   }
   let d = @eaf.Document::{
+    extensions: @eaf.empty_extensions(),
     author: "MoonELAN synthetic corpus",
     version: if seed % 2 == 0 {
       "3.0"

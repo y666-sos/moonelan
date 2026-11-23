@@ -2,7 +2,10 @@
 fn sample_document() -> Document {
   {
     ..empty_document(),
-    times: [{ id: "ts0", milliseconds: 0, }, { id: "ts1", milliseconds: 1000, }],
+    times: [
+      { id: "ts0", milliseconds: Some(0), },
+      { id: "ts1", milliseconds: Some(1000), },
+    ],
     types: [
       { id: "utterance", constraint: Independent, },
       { id: "translation", constraint: SymbolicAssociation, },

@@ -16,10 +16,12 @@ pub fn select_tiers(
     }
   }
   let result = snapshot(d)
-  compact({
-    ..result,
-    tiers: result.tiers.filter(fn(t) { keep.contains(t.id) }),
-  })
+  compact(
+    prune_extension_owners({
+      ..result,
+      tiers: result.tiers.filter(fn(t) { keep.contains(t.id) }),
+    }),
+  )
 }
 
 ///|
@@ -61,5 +63,5 @@ pub fn extract_roots(
       }),
     }
   }
-  compact(result)
+  compact(prune_extension_owners(result))
 }

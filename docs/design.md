@@ -15,3 +15,12 @@ Corpus rows use topological tiers and sorted parent groups. Within a symbolic gr
 The EAF reader is strict about recognized semantics, but is not an XSD validator. It tolerates noncanonical root child order and ignores XML comments/processing instructions; output is canonical in EAF schema order. Formatting, namespace hints and constraint prose are not archival metadata. See the Chinese README for the exact unsupported subset, budgets and platform requirements.
 
 Worst cases: tier ordering O(T²), temporal containment O(A_child × A_parent), resolution O(A), symbolic validation O(A), sibling sorting O(A log A). Whole-document transactional copies favor correctness and modest corpus editing over incremental large-file workloads. There is no benchmark or throughput claim in this release.
+
+
+## Optional timing and EAF metadata (0.2.0)
+
+A time slot contains `Int32?`. An unknown boundary is never represented by zero or an interpolated value. With missing boundaries, TIME_ORDER supplies structural coordinates for containment, overlap and subdivision coverage; complete clocks retain the numeric checks. Exact-time APIs fail when their own result is unknown, while `annotation_timing`, `corpus_records` and dataset exports preserve optional boundaries. Timeline resampling touches known values only.
+
+Structured standard metadata lives in `Extensions`: schema-shaped elements, and attributes owned by media/tier/type/annotation identifiers. Known shape, ID uniqueness, language/locale/external/lexicon targets, internal multilingual CV entry/value bindings and reference-link endpoints are validated in the main graph path. Unknown elements remain errors. Metadata arrays are deeply copied by snapshot. Annotation/tier rename updates ownership and reference links; filtering/removal prunes deleted owners and invalid links, including transitive links to deleted links. Shared vocabulary and language definitions are retained.
+
+`set_controlled_value` performs entry/language selection and updates value, CVE_REF and LANG_REF as one validated transaction. Offline external CV references are retained without pretending to have validated remote contents. Callers own resource access. JSON schema v2 makes optional time values explicit; legacy exact `CorpusRow` remains available through `corpus_rows`.

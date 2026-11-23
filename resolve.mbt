@@ -20,10 +20,7 @@ fn resolved_spans(
     for a in d.tiers[i].annotations {
       let s = match a {
         Aligned(_, lo, hi, _) =>
-          Span::{
-            start: ix.times.get(lo).unwrap(),
-            end: ix.times.get(hi).unwrap(),
-          }
+          Span::{ start: exact_time(ix, lo), end: exact_time(ix, hi), }
         Reference(_, target, _, _) =>
           match spans.get(target) {
             Some(s) => s
@@ -40,9 +37,10 @@ fn resolved_spans(
 /// Resolve arbitrarily many symbolic levels without recursion.
 pub fn resolve(d : Document, id : String) -> Span raise EafError {
   let ix = graph_index(d, default_limits())
-  match resolved_spans(d, ix).get(id) {
-    Some(s) => s
-    None => raise Invalid("unknown annotation")
+  let timing = timing_from_index(d, ix, id)
+  match (timing.start_ms, timing.end_ms) {
+    (Some(start), Some(end)) => { start, end, }
+    _ => raise Invalid("time is unaligned; use annotation_timing")
   }
 }
 

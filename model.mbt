@@ -24,10 +24,10 @@ pub(all) struct LinguisticType {
 } derive(Debug, Eq)
 
 ///|
-/// Times are integer milliseconds, bounded by the positive Int range.
+/// Milliseconds are optional: None preserves an unaligned EAF time boundary.
 pub(all) struct TimeSlot {
   id : String
-  milliseconds : Int32
+  milliseconds : Int32?
 } derive(Debug, Eq)
 
 ///|
@@ -66,6 +66,7 @@ pub(all) struct Document {
   times : Array[TimeSlot]
   types : Array[LinguisticType]
   tiers : Array[Tier]
+  extensions : Extensions
 } derive(Debug, Eq)
 
 ///|
@@ -99,6 +100,7 @@ pub fn empty_document() -> Document {
     times: [],
     types: [],
     tiers: [],
+    extensions: empty_extensions(),
   }
 }
 
@@ -140,6 +142,7 @@ pub fn is_time_alignable(c : Constraint) -> Bool {
 pub fn snapshot(d : Document) -> Document {
   {
     ..d,
+    extensions: copy_extensions(d.extensions),
     media: d.media.copy(),
     properties: d.properties.copy(),
     times: d.times.copy(),
@@ -154,7 +157,7 @@ fn valid_id(id : String) -> Bool {
     return false
   }
   for c in id.to_array() {
-    if c <= ' ' || c == '<' || c == '>' || c == '&' || c == '"' || c == '\'' {
+    if c < ' ' || c == '<' || c == '>' || c == '&' || c == '"' || c == '\'' {
       return false
     }
   }

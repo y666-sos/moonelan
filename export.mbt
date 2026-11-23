@@ -13,15 +13,15 @@ pub fn to_csv(d : Document) -> String raise EafError {
   out.write_string(
     "tier,participant,id,parent,root,start_ms,end_ms,sibling_index,value\r\n",
   )
-  for r in corpus_rows(d) {
+  for r in corpus_records(d) {
     let cells = [
       r.tier,
       r.participant,
       r.id,
       r.parent.unwrap_or(""),
       r.root,
-      r.span.start.to_string(),
-      r.span.end.to_string(),
+      optional_ms(r.timing.start_ms),
+      optional_ms(r.timing.end_ms),
       r.sibling_index.to_string(),
       r.value,
     ]
@@ -34,7 +34,7 @@ pub fn to_csv(d : Document) -> String raise EafError {
 ///|
 /// Versioned JSON dataset preserving complete hierarchy paths and null parents.
 pub fn to_json(d : Document) -> String raise EafError {
-  let rows : Array[Json] = corpus_rows(d).map(fn(r) {
+  let rows : Array[Json] = corpus_records(d).map(fn(r) {
     @json.to_json(
       Map([
         ("tier", @json.to_json(r.tier)),
@@ -49,8 +49,8 @@ pub fn to_json(d : Document) -> String raise EafError {
         ),
         ("root", @json.to_json(r.root)),
         ("path", @json.to_json(r.path)),
-        ("start_ms", @json.to_json(r.span.start)),
-        ("end_ms", @json.to_json(r.span.end)),
+        ("start_ms", optional_json_ms(r.timing.start_ms)),
+        ("end_ms", optional_json_ms(r.timing.end_ms)),
         ("sibling_index", @json.to_json(r.sibling_index)),
         ("value", @json.to_json(r.value)),
       ]),
@@ -58,8 +58,24 @@ pub fn to_json(d : Document) -> String raise EafError {
   })
   @json.to_json(
     Map([
-      ("schema", @json.to_json("moonelan.corpus.v1")),
+      ("schema", @json.to_json("moonelan.corpus.v2")),
       ("rows", @json.to_json(rows)),
     ]),
   ).stringify()
+}
+
+///|
+fn optional_ms(value : Int32?) -> String {
+  match value {
+    Some(ms) => ms.to_string()
+    None => ""
+  }
+}
+
+///|
+fn optional_json_ms(value : Int32?) -> Json {
+  match value {
+    Some(ms) => @json.to_json(ms)
+    None => null
+  }
 }

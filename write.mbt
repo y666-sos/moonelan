@@ -22,27 +22,50 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
       "http://www.mpi.nl/tools/elan/EAFv" + d.version + ".xsd",
     ),
   ])
-  w.start_element("HEADER", [("MEDIA_FILE", ""), ("TIME_UNITS", "milliseconds")])
+  for e in d.extensions.elements {
+    if e.name == "LICENSE" {
+      write_element(w, e)
+    }
+  }
+  w.start_element(
+    "HEADER",
+    [("TIME_UNITS", "milliseconds")] + d.extensions.header_attributes,
+  )
   for m in d.media {
-    w.empty_element("MEDIA_DESCRIPTOR", [
-      ("MEDIA_URL", m.url),
-      ("RELATIVE_MEDIA_URL", m.relative_url),
-      ("MIME_TYPE", m.mime_type),
-      ("TIME_ORIGIN", m.time_origin.to_string()),
-    ])
+    w.empty_element(
+      "MEDIA_DESCRIPTOR",
+      [
+        ("MEDIA_URL", m.url),
+        ("RELATIVE_MEDIA_URL", m.relative_url),
+        ("MIME_TYPE", m.mime_type),
+        ("TIME_ORIGIN", m.time_origin.to_string()),
+      ] +
+      object_attrs(d.extensions.media_attributes, m.url),
+    )
+  }
+  for e in d.extensions.header_elements {
+    write_element(w, e)
   }
   for (name, value) in d.properties {
-    w.start_element("PROPERTY", [("NAME", name)])
+    w.start_element(
+      "PROPERTY",
+      if name.is_empty() {
+        []
+      } else {
+        [("NAME", name)]
+      },
+    )
     w.text(value)
     w.end_element("PROPERTY")
   }
   w.end_element("HEADER")
   w.start_element("TIME_ORDER", [])
   for s in d.times {
-    w.empty_element("TIME_SLOT", [
-      ("TIME_SLOT_ID", s.id),
-      ("TIME_VALUE", s.milliseconds.to_string()),
-    ])
+    let attrs = [("TIME_SLOT_ID", s.id)]
+    if s.milliseconds is Some(ms) {
+      attrs.push(("TIME_VALUE", ms.to_string()))
+    }
+    w.empty_element("TIME_SLOT", attrs)
   }
   w.end_element("TIME_ORDER")
   for t in d.tiers {
@@ -55,7 +78,10 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
     if t.parent is Some(p) {
       attrs.push(("PARENT_REF", p))
     }
-    w.start_element("TIER", attrs)
+    w.start_element(
+      "TIER",
+      attrs + object_attrs(d.extensions.tier_attributes, t.id),
+    )
     for a in t.annotations {
       w.start_element("ANNOTATION", [])
       let (tag, aa) = match a {
@@ -76,7 +102,10 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
           ("REF_ANNOTATION", aa)
         }
       }
-      w.start_element(tag, aa)
+      w.start_element(
+        tag,
+        aa + object_attrs(d.extensions.annotation_attributes, annotation_id(a)),
+      )
       w.start_element("ANNOTATION_VALUE", [])
       w.text(annotation_value(a))
       w.end_element("ANNOTATION_VALUE")
@@ -96,12 +125,21 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
           "false"
         },
       ),
-      ("GRAPHIC_REFERENCES", "false"),
     ]
     if t.constraint != Independent {
       attrs.push(("CONSTRAINTS", constraint_name(t.constraint)))
     }
-    w.empty_element("LINGUISTIC_TYPE", attrs)
+    w.empty_element(
+      "LINGUISTIC_TYPE",
+      attrs + object_attrs(d.extensions.type_attributes, t.id),
+    )
+  }
+  for name in ["LOCALE", "LANGUAGE"] {
+    for e in d.extensions.elements {
+      if e.name == name {
+        write_element(w, e)
+      }
+    }
   }
   for
     c in [TimeSubdivision, IncludedIn, SymbolicAssociation, SymbolicSubdivision] {
@@ -109,6 +147,16 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
       ("STEREOTYPE", constraint_name(c)),
       ("DESCRIPTION", constraint_name(c)),
     ])
+  }
+  for
+    name in [
+      "CONTROLLED_VOCABULARY", "LEXICON_REF", "REF_LINK_SET", "EXTERNAL_REF",
+    ] {
+    for e in d.extensions.elements {
+      if e.name == name {
+        write_element(w, e)
+      }
+    }
   }
   w.end_element("ANNOTATION_DOCUMENT")
   w.to_string()

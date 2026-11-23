@@ -6,7 +6,7 @@ import {
 }
 
 // Values
-pub fn corpus(Int) -> @moonelan.Document raise @moonelan.EafError
+pub fn corpus(Int32) -> @moonelan.Document raise @moonelan.EafError
 
 // Errors
 

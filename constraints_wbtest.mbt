@@ -3,7 +3,7 @@ fn subdivided_document() -> Document {
   let d = sample_document()
   {
     ..d,
-    times: d.times + [{ id: "tsm", milliseconds: 400, }],
+    times: d.times + [{ id: "tsm", milliseconds: Some(400), }],
     types: d.types + [{ id: "word", constraint: TimeSubdivision, }],
     tiers: d.tiers +
     [

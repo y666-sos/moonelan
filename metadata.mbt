@@ -2,12 +2,37 @@
 /// The portable ID subset deliberately excludes colon and non-ASCII characters.
 /// Tier and linguistic-type labels may still contain Unicode.
 fn validate_xml_id(id : String) -> Unit raise EafError {
-  let chars = id.to_array()
-  guard !chars.is_empty() else { raise Invalid("empty XML ID") }
-  for i, c in chars {
-    let letter = c.is_ascii_alphabetic() || c == '_'
-    guard letter || (i > 0 && (c.is_ascii_digit() || c == '-' || c == '.')) else {
-      raise Unsupported("XML ID outside portable ASCII NCName subset")
+  let cs = id.to_array()
+  guard !cs.is_empty() else { raise Invalid("empty XML ID") }
+  for i, c in cs {
+    let n = c.to_int()
+    let first = c.is_ascii_alphabetic() ||
+      c == '_' ||
+      (n >= 0xC0 && n <= 0xD6) ||
+      (n >= 0xD8 && n <= 0xF6) ||
+      (n >= 0xF8 && n <= 0x2FF) ||
+      (n >= 0x370 && n <= 0x37D) ||
+      (n >= 0x37F && n <= 0x1FFF) ||
+      (n >= 0x200C && n <= 0x200D) ||
+      (n >= 0x2070 && n <= 0x218F) ||
+      (n >= 0x2C00 && n <= 0x2FEF) ||
+      (n >= 0x3001 && n <= 0xD7FF) ||
+      (n >= 0xF900 && n <= 0xFDCF) ||
+      (n >= 0xFDF0 && n <= 0xFFFD) ||
+      (n >= 0x10000 && n <= 0xEFFFF)
+    guard first ||
+      (
+        i > 0 &&
+        (
+          c.is_ascii_digit() ||
+          c == '-' ||
+          c == '.' ||
+          n == 0xB7 ||
+          (n >= 0x300 && n <= 0x36F) ||
+          (n >= 0x203F && n <= 0x2040)
+        )
+      ) else {
+      raise Invalid("invalid XML NCName")
     }
   }
 }
@@ -124,7 +149,7 @@ fn validate_metadata(d : Document) -> Unit raise EafError {
   validate_date(d.date)
   xml_text(d.author)
   for m in d.media {
-    guard !m.url.is_empty() && !m.mime_type.is_empty() && m.time_origin >= 0 else {
+    guard !m.url.is_empty() && !m.mime_type.is_empty() else {
       raise Invalid("invalid media descriptor")
     }
     xml_text(m.url)
@@ -132,7 +157,6 @@ fn validate_metadata(d : Document) -> Unit raise EafError {
     xml_text(m.mime_type)
   }
   for (name, value) in d.properties {
-    guard !name.is_empty() else { raise Invalid("empty property name") }
     xml_text(name)
     xml_text(value)
   }

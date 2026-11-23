@@ -69,7 +69,7 @@ def verify_case(seed, text, dataset, csv_text, schemas, directory):
     independent = Eaf(str(path))
     assert set(independent.get_tier_names()) == {
         "speech", "words", "translation", "morphology", "pos", "gesture"}
-    assert dataset["schema"] == "moonelan.corpus.v1"
+    assert dataset["schema"] == "moonelan.corpus.v2"
     rows = dataset["rows"]
     assert len(rows) == 22
     csv_rows = list(csv.DictReader(io.StringIO(csv_text, newline="")))

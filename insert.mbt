@@ -18,6 +18,7 @@ pub fn replace_annotations(
     result.times.push(s)
   }
   result.tiers[ti] = { ..result.tiers[ti], annotations: annotations.copy(), }
+  let result = prune_extension_owners(result)
   validate(result)
   result
 }

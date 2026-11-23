@@ -79,7 +79,7 @@ fn temporal_parents(
 /// Temporal tier constraints; symbolic chain rules are a separate validation step.
 pub fn validate_temporal(d : Document) -> Unit raise EafError {
   let ix = graph_index(d, default_limits())
-  let spans = resolved_spans(d, ix)
+  let spans = structural_spans(d, ix)
   ignore(temporal_parents(d, ix, spans))
 }
 
@@ -94,6 +94,6 @@ pub fn parent_annotation(d : Document, id : String) -> String? raise EafError {
   match d.tiers[ti].annotations[ai] {
     Reference(_, p, _, _) => Some(p)
     Aligned(_, _, _, _) =>
-      temporal_parents(d, ix, resolved_spans(d, ix)).get(id)
+      temporal_parents(d, ix, structural_spans(d, ix)).get(id)
   }
 }

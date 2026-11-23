@@ -23,7 +23,7 @@ jobs:
           python-version: '3.12'
       - name: Install pinned official MoonBit SDK
         env:
-          MOONBIT_INSTALL_VERSION: 0.10.15+943464bfa
+          MOONBIT_INSTALL_VERSION: 0.10.18+6c83a7f62
         run: |
           curl --fail --location https://cli.moonbitlang.com/install/unix.sh -o /tmp/moonbit-install.sh
           bash /tmp/moonbit-install.sh
@@ -49,3 +49,4 @@ jobs:
         run: |
           python -m pip install -r scripts/requirements-oracle.txt
           python scripts/verify_interop.py --target ${{ matrix.target }}
+          python scripts/verify_compatibility.py --target ${{ matrix.target }}

@@ -98,7 +98,7 @@ pub fn validate(
   limits~ : Limits = default_limits(),
 ) -> Unit raise EafError {
   let ix = graph_index(d, limits)
-  ignore(temporal_parents(d, ix, resolved_spans(d, ix)))
+  ignore(temporal_parents(d, ix, structural_spans(d, ix)))
   ignore(symbolic_groups(d, ix))
 }
 
@@ -119,7 +119,7 @@ pub fn children(
     raise Invalid("unknown parent annotation")
   }
   let c = ix.types.get(d.tiers[ti].linguistic_type).unwrap()
-  let spans = resolved_spans(d, ix)
+  let spans = structural_spans(d, ix)
   let temporal = temporal_parents(d, ix, spans)
   let selected = d.tiers[ti].annotations.filter(fn(a) {
     match a {

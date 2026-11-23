@@ -38,6 +38,7 @@ pub fn rename_annotation(
       }
     }
   }
+  let result = rename_extension_identity(result, old, name, annotation=true)
   validate(result)
   result
 }
@@ -72,6 +73,7 @@ pub fn rename_tier(
       },
     }
   }
+  let result = rename_extension_identity(result, old, name, annotation=false)
   validate(result)
   result
 }

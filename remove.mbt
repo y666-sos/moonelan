@@ -3,7 +3,7 @@ fn annotation_parents(
   d : Document,
   ix : GraphIndex,
 ) -> Map[String, String] raise EafError {
-  let result = temporal_parents(d, ix, resolved_spans(d, ix))
+  let result = temporal_parents(d, ix, structural_spans(d, ix))
   for t in d.tiers {
     for a in t.annotations {
       if a is Reference(id, target, _, _) {
@@ -83,7 +83,7 @@ pub fn remove_annotation(
     }
     result.tiers[ti] = { ..t, annotations: kept, }
   }
-  compact(result)
+  compact(prune_extension_owners(result))
 }
 
 ///|
@@ -102,8 +102,10 @@ pub fn remove_tier(d : Document, tier : String) -> Document raise EafError {
     }
   }
   let result = snapshot(d)
-  compact({
-    ..result,
-    tiers: result.tiers.filter(fn(t) { !removed.contains(t.id) }),
-  })
+  compact(
+    prune_extension_owners({
+      ..result,
+      tiers: result.tiers.filter(fn(t) { !removed.contains(t.id) }),
+    }),
+  )
 }

@@ -143,3 +143,35 @@ pub fn is_eaf_xml(text : String) -> Bool {
     _ => false
   }
 }
+
+///|
+fn parse_boolean(value : String) -> Bool raise EafError {
+  match value {
+    "true" | "1" => true
+    "false" | "0" => false
+    _ => raise Invalid("invalid boolean")
+  }
+}
+
+///|
+fn parse_signed_milliseconds(value : String) -> Int32 raise EafError {
+  let cs = value.to_array()
+  guard !cs.is_empty() else { raise Invalid("empty signed time") }
+  let negative = cs[0] == '-'
+  let start = if negative || cs[0] == '+' { 1 } else { 0 }
+  guard start < cs.length() && cs.length() - start <= 10 else {
+    raise Invalid("invalid signed time")
+  }
+  let mut n = 0L
+  for i = start; i < cs.length(); i = i + 1 {
+    guard cs[i].is_ascii_digit() else {
+      raise Invalid("nondecimal signed time")
+    }
+    n = n * 10L + (cs[i].to_int() - 48).to_int64()
+  }
+  let n = if negative { -n } else { n }
+  guard n >= -2147483648L && n <= 2147483647L else {
+    raise Invalid("signed time overflow")
+  }
+  n.to_int()
+}

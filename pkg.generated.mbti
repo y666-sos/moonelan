@@ -10,9 +10,11 @@ pub fn add_tier(Document, Tier, Constraint, times? : Array[TimeSlot]) -> Documen
 
 pub fn annotation_id(Annotation) -> String
 
+pub fn annotation_timing(Document, String) -> Timing raise EafError
+
 pub fn annotation_value(Annotation) -> String
 
-pub fn annotations_between(Document, String, Int, Int) -> Array[Annotation] raise EafError
+pub fn annotations_between(Document, String, Int32, Int32) -> Array[Annotation] raise EafError
 
 pub fn children(Document, String, String) -> Array[Annotation] raise EafError
 
@@ -20,11 +22,15 @@ pub fn compact(Document) -> Document raise EafError
 
 pub fn constraint_name(Constraint) -> String
 
+pub fn corpus_records(Document) -> Array[CorpusRecord] raise EafError
+
 pub fn corpus_rows(Document) -> Array[CorpusRow] raise EafError
 
 pub fn default_limits() -> Limits
 
 pub fn empty_document() -> Document
+
+pub fn empty_extensions() -> Extensions
 
 pub fn extract_roots(Document, Array[String]) -> Document raise EafError
 
@@ -50,15 +56,17 @@ pub fn rename_tier(Document, String, String) -> Document raise EafError
 
 pub fn replace_annotations(Document, String, Array[Annotation], times? : Array[TimeSlot]) -> Document raise EafError
 
-pub fn resample(Document, Int, Int, offset? : Int) -> Document raise EafError
+pub fn resample(Document, Int32, Int32, offset? : Int32) -> Document raise EafError
 
 pub fn resolve(Document, String) -> Span raise EafError
 
 pub fn retime(Document, Array[TimeSlot]) -> Document raise EafError
 
-pub fn rows_between(Document, Int, Int) -> Array[CorpusRow] raise EafError
+pub fn rows_between(Document, Int32, Int32) -> Array[CorpusRow] raise EafError
 
 pub fn select_tiers(Document, Array[String]) -> Document raise EafError
+
+pub fn set_controlled_value(Document, String, String, String) -> Document raise EafError
 
 pub fn set_value(Document, String, String) -> Document raise EafError
 
@@ -79,6 +87,8 @@ pub fn validate_identifier(String) -> Unit raise EafError
 pub fn validate_structure(Document, limits? : Limits) -> Unit raise EafError
 
 pub fn validate_temporal(Document) -> Unit raise EafError
+
+pub fn vocabulary_choices(Document, String, String) -> Array[VocabularyChoice] raise EafError
 
 pub fn write(Document) -> String raise EafError
 
@@ -111,6 +121,22 @@ pub fn Constraint::equal(Self, Self) -> Bool
 pub fn Constraint::not_equal(Self, Self) -> Bool
 pub fn Constraint::to_repr(Self) -> @debug.Repr
 
+pub(all) struct CorpusRecord {
+  tier : String
+  participant : String
+  id : String
+  parent : String?
+  root : String
+  path : Array[String]
+  timing : Timing
+  cv_entry : String?
+  sibling_index : Int32
+  value : String
+} derive(Eq, @debug.Debug)
+pub fn CorpusRecord::equal(Self, Self) -> Bool
+pub fn CorpusRecord::not_equal(Self, Self) -> Bool
+pub fn CorpusRecord::to_repr(Self) -> @debug.Repr
+
 pub(all) struct CorpusRow {
   tier : String
   participant : String
@@ -119,7 +145,7 @@ pub(all) struct CorpusRow {
   root : String
   path : Array[String]
   span : Span
-  sibling_index : Int
+  sibling_index : Int32
   value : String
 } derive(Eq, @debug.Debug)
 pub fn CorpusRow::equal(Self, Self) -> Bool
@@ -135,17 +161,41 @@ pub(all) struct Document {
   times : Array[TimeSlot]
   types : Array[LinguisticType]
   tiers : Array[Tier]
+  extensions : Extensions
 } derive(Eq, @debug.Debug)
 pub fn Document::equal(Self, Self) -> Bool
 pub fn Document::not_equal(Self, Self) -> Bool
 pub fn Document::to_repr(Self) -> @debug.Repr
 
+pub(all) struct Element {
+  name : String
+  attributes : Array[(String, String)]
+  text : String
+  children : Array[Element]
+} derive(Eq, @debug.Debug)
+pub fn Element::equal(Self, Self) -> Bool
+pub fn Element::not_equal(Self, Self) -> Bool
+pub fn Element::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Extensions {
+  elements : Array[Element]
+  header_attributes : Array[(String, String)]
+  header_elements : Array[Element]
+  media_attributes : Array[ObjectAttributes]
+  tier_attributes : Array[ObjectAttributes]
+  type_attributes : Array[ObjectAttributes]
+  annotation_attributes : Array[ObjectAttributes]
+} derive(Eq, @debug.Debug)
+pub fn Extensions::equal(Self, Self) -> Bool
+pub fn Extensions::not_equal(Self, Self) -> Bool
+pub fn Extensions::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Limits {
-  input_units : Int
-  nodes : Int
-  depth : Int
-  tiers : Int
-  annotations : Int
+  input_units : Int32
+  nodes : Int32
+  depth : Int32
+  tiers : Int32
+  annotations : Int32
 } derive(Eq, @debug.Debug)
 pub fn Limits::equal(Self, Self) -> Bool
 pub fn Limits::not_equal(Self, Self) -> Bool
@@ -163,15 +213,23 @@ pub(all) struct Media {
   url : String
   relative_url : String
   mime_type : String
-  time_origin : Int
+  time_origin : Int32
 } derive(Eq, @debug.Debug)
 pub fn Media::equal(Self, Self) -> Bool
 pub fn Media::not_equal(Self, Self) -> Bool
 pub fn Media::to_repr(Self) -> @debug.Repr
 
+pub(all) struct ObjectAttributes {
+  id : String
+  values : Array[(String, String)]
+} derive(Eq, @debug.Debug)
+pub fn ObjectAttributes::equal(Self, Self) -> Bool
+pub fn ObjectAttributes::not_equal(Self, Self) -> Bool
+pub fn ObjectAttributes::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Span {
-  start : Int
-  end : Int
+  start : Int32
+  end : Int32
 } derive(Eq, @debug.Debug)
 pub fn Span::equal(Self, Self) -> Bool
 pub fn Span::not_equal(Self, Self) -> Bool
@@ -191,11 +249,29 @@ pub fn Tier::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TimeSlot {
   id : String
-  milliseconds : Int
+  milliseconds : Int32?
 } derive(Eq, @debug.Debug)
 pub fn TimeSlot::equal(Self, Self) -> Bool
 pub fn TimeSlot::not_equal(Self, Self) -> Bool
 pub fn TimeSlot::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Timing {
+  start_ms : Int32?
+  end_ms : Int32?
+} derive(Eq, @debug.Debug)
+pub fn Timing::equal(Self, Self) -> Bool
+pub fn Timing::not_equal(Self, Self) -> Bool
+pub fn Timing::to_repr(Self) -> @debug.Repr
+
+pub(all) struct VocabularyChoice {
+  entry_id : String
+  language : String
+  value : String
+  description : String
+} derive(Eq, @debug.Debug)
+pub fn VocabularyChoice::equal(Self, Self) -> Bool
+pub fn VocabularyChoice::not_equal(Self, Self) -> Bool
+pub fn VocabularyChoice::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

@@ -14,3 +14,8 @@ MoonELAN is an original MIT-licensed implementation by y666-sos. No upstream imp
 The XML dependency retains its own Apache-2.0 notices in the dependency distribution. Our MIT license does not relicense dependencies or external verification material. `scripts/verify_interop.py` downloads schemas without running their content as code and disables external XML network access through lxml's default parser; schemas used here have no external includes.
 
 AI was used for research, design, code, tests, debugging and documentation. The account owner remains responsible for correctness and source/license review. No official contest acceptance or absolute ecosystem uniqueness is claimed.
+
+
+## 0.2.0 compatibility fixtures
+
+`examples/compatibility` and compatibility tests are original synthetic multilingual corpus data designed against the same pinned EAF 2.8/3.0 schemas. `examples/foreign` embeds original synthetic data serialized by pympi-ling 1.70.2, with an optional TIME_VALUE independently omitted using Python ElementTree. No pympi implementation code, external recordings, organizer email or private application is included. Reference links are checked with the EAF 3.0 XSD because pympi does not expose their semantics. Internal CV bindings are independently inspected as XML as well as through pympi's CV model. External CV network fetching is deliberately left to callers.

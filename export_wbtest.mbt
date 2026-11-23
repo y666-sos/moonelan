@@ -4,7 +4,7 @@ test "CSV quotes multiline comma and quote payloads and JSON preserves paths" {
   let csv = to_csv(d)
   assert_true(csv.contains("\"a,\"\"b\"\"\n中\"\r\n"))
   guard @json.parse(to_json(d)) is Object(obj) else { fail("object") }
-  assert_eq(obj.get("schema"), Some(@json.to_json("moonelan.corpus.v1")))
+  assert_eq(obj.get("schema"), Some(@json.to_json("moonelan.corpus.v2")))
   guard obj.get("rows") is Some(Array(rows)) else { fail("rows array") }
   guard rows[0] is Object(first) else { fail("row object") }
   guard rows[1] is Object(second) else { fail("row object") }

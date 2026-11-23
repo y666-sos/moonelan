@@ -2,7 +2,7 @@
 priv struct GraphIndex {
   tiers : Map[String, Int32]
   types : Map[String, Constraint]
-  times : Map[String, Int32]
+  times : Map[String, Int32?]
   annotations : Map[String, (Int32, Int32)]
   order : Array[Int32]
 }
@@ -33,7 +33,7 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
   }
   let tiers : Map[String, Int32] = Map([])
   let types : Map[String, Constraint] = Map([])
-  let times : Map[String, Int32] = Map([])
+  let times : Map[String, Int32?] = Map([])
   let annotations : Map[String, (Int32, Int32)] = Map([])
   for t in d.types {
     validate_identifier(t.id)
@@ -46,7 +46,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
     validate_xml_id(s.id)
     guard !xml_ids.contains(s.id) else { raise Invalid("XML ID collision") }
     xml_ids[s.id] = true
-    guard s.milliseconds >= 0 else { raise Invalid("negative time slot") }
+    if s.milliseconds is Some(ms) {
+      guard ms >= 0 else { raise Invalid("negative time slot") }
+    }
     guard !times.contains(s.id) else { raise Invalid("duplicate time slot") }
     times[s.id] = s.milliseconds
   }
@@ -99,8 +101,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
           guard times.contains(s1) && times.contains(s2) else {
             raise Invalid("missing time slot")
           }
-          guard times.get(s1).unwrap() < times.get(s2).unwrap() else {
-            raise Invalid("nonpositive annotation span")
+          if times.get(s1).unwrap() is Some(lo) &&
+            times.get(s2).unwrap() is Some(hi) {
+            guard lo < hi else { raise Invalid("nonpositive annotation span") }
           }
         }
         Reference(_, target, previous, _) => {
@@ -155,7 +158,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
       raise Invalid("cyclic tier hierarchy")
     }
   }
-  { tiers, types, times, annotations, order, }
+  let ix = GraphIndex::{ tiers, types, times, annotations, order, }
+  validate_extensions(d, ix, xml_ids, limits)
+  ix
 }
 
 ///|
