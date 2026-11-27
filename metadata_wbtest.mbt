@@ -8,7 +8,7 @@ test "metadata rejects invalid Gregorian dates XML characters and global ID coll
   }
   for
     date in [
-      "1900-02-29T00:00:00Z", "2026-11-31T00:00:00Z", "2026-11-11T24:00:00Z", "2026-11-11T00:00:00+14:01",
+      "1900-02-29T00:00:00Z", "2026-11-31T00:00:00Z", "2026-11-11T24:00:01Z", "2026-11-11T00:00:00+14:01",
     ] {
     try validate_date(date) catch {
       _ => ()

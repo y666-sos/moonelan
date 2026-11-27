@@ -27,7 +27,7 @@ pub(all) struct LinguisticType {
 /// Milliseconds are optional: None preserves an unaligned EAF time boundary.
 pub(all) struct TimeSlot {
   id : String
-  milliseconds : Int32?
+  milliseconds : Int64?
 } derive(Debug, Eq)
 
 ///|
@@ -52,7 +52,7 @@ pub(all) struct Media {
   url : String
   relative_url : String
   mime_type : String
-  time_origin : Int32
+  time_origin : Int64
 } derive(Debug, Eq)
 
 ///|

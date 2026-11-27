@@ -125,6 +125,10 @@ fn import_element(n : XmlNode) -> Element {
 
 ///|
 fn write_element(w : @xml.Writer, e : Element) -> Unit raise @xml.WriterError {
+  if e.text.is_empty() && e.children.is_empty() {
+    w.empty_element(e.name, e.attributes)
+    return
+  }
   w.start_element(e.name, e.attributes)
   if !e.text.is_empty() {
     w.text(e.text)
@@ -172,6 +176,7 @@ fn metadata_shape(
   guard count.val <= limits.nodes else { raise Budget("metadata nodes") }
   let (allowed, required, children, textual) = match e.name {
     "LICENSE" => (["LICENSE_URL"], [], [], true)
+    "CONSTRAINT" => (["STEREOTYPE", "DESCRIPTION"], ["STEREOTYPE"], [], false)
     "LINKED_FILE_DESCRIPTOR" =>
       (
         [
@@ -380,8 +385,8 @@ fn validate_extensions(
   }
   for node in e.elements {
     guard [
-      "LICENSE", "LOCALE", "LANGUAGE", "CONTROLLED_VOCABULARY", "LEXICON_REF", "REF_LINK_SET",
-      "EXTERNAL_REF",
+      "LICENSE", "CONSTRAINT", "LOCALE", "LANGUAGE", "CONTROLLED_VOCABULARY", "LEXICON_REF",
+      "REF_LINK_SET", "EXTERNAL_REF",
     ].contains(node.name) else {
       raise Invalid("root metadata placement")
     }

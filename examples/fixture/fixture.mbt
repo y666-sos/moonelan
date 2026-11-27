@@ -18,9 +18,12 @@ pub fn corpus(seed : Int32) -> @eaf.Document raise @eaf.EafError {
     let end = "e" + suffix
     let g1 = "gstart" + suffix
     let g2 = "gend" + suffix
-    let lo = offset + i * 1500
+    let lo = (offset + i * 1500).to_int64()
     times.push({ id: start, milliseconds: Some(lo), })
-    times.push({ id: mid, milliseconds: Some(lo + 300 + seed % 100), })
+    times.push({
+      id: mid,
+      milliseconds: Some(lo + 300 + (seed % 100).to_int64()),
+    })
     times.push({ id: end, milliseconds: Some(lo + 1000), })
     times.push({ id: g1, milliseconds: Some(lo + 100), })
     times.push({ id: g2, milliseconds: Some(lo + 200), })

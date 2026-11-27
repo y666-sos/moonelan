@@ -1,8 +1,8 @@
 ///|
 /// Explicit annotation boundaries. None is an unaligned boundary, never zero.
 pub(all) struct Timing {
-  start_ms : Int32?
-  end_ms : Int32?
+  start_ms : Int64?
+  end_ms : Int64?
 } derive(Debug, Eq)
 
 ///|
@@ -12,7 +12,7 @@ pub extend Timing with @debug.Debug::{to_repr}
 pub extend Timing with Eq::{equal, not_equal}
 
 ///|
-fn exact_time(ix : GraphIndex, slot : String) -> Int32 raise EafError {
+fn exact_time(ix : GraphIndex, slot : String) -> Int64 raise EafError {
   match ix.times.get(slot).unwrap() {
     Some(ms) => ms
     None =>
@@ -64,9 +64,9 @@ fn structural_spans(
   if !d.times.any(fn(s) { s.milliseconds == None }) {
     return resolved_spans(d, ix)
   }
-  let coordinates : Map[String, Int32] = Map([])
-  let mut rank = 0
-  let mut previous_time : Int32? = None
+  let coordinates : Map[String, Int64] = Map([])
+  let mut rank = 0L
+  let mut previous_time : Int64? = None
   let mut previous_was_known = false
   for s in d.times {
     if s.milliseconds is Some(ms) {

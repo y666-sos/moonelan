@@ -19,3 +19,7 @@ AI was used for research, design, code, tests, debugging and documentation. The 
 ## 0.2.0 compatibility fixtures
 
 `examples/compatibility` and compatibility tests are original synthetic multilingual corpus data designed against the same pinned EAF 2.8/3.0 schemas. `examples/foreign` embeds original synthetic data serialized by pympi-ling 1.70.2, with an optional TIME_VALUE independently omitted using Python ElementTree. No pympi implementation code, external recordings, organizer email or private application is included. Reference links are checked with the EAF 3.0 XSD because pympi does not expose their semantics. Internal CV bindings are independently inspected as XML as well as through pympi's CV model. External CV network fetching is deliberately left to callers.
+
+## 0.3.0 schema facts and conformance tests
+
+`scripts/build_eaf30_rules.py` extracts element/attribute/type/cardinality facts from the pinned EAF 3.0 schema and generates `eaf30_generated.mbt`. It does not translate ELAN application implementation code or redistribute the schema. The generator verifies the schema SHA-256 and its check mode compares token streams after formatting. Generated rules are excluded from substantive production LOC. `schema.mbt`, `file.mbt` and the test harness are original project code. The EAF 3.0 matrix and supplied ECV workflow use original synthetic data; lxml and pympi are test-only dependencies. The original XML dependency license and all upstream rights remain unchanged.

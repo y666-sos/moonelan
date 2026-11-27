@@ -32,9 +32,7 @@ fn xml_tree(text : String, limits : Limits) -> XmlNode raise EafError {
   guard text.length() <= limits.input_units else {
     raise Budget("XML input too large")
   }
-  guard !text.contains("<!DOCTYPE") && !text.contains("<!ENTITY") else {
-    raise Unsupported("DTD and entity declarations")
-  }
+  reject_dtd(text)
   let reader = @xml.Reader::from_string(text)
   let stack : Array[XmlNode] = []
   let roots : Array[XmlNode] = []
@@ -68,6 +66,8 @@ fn xml_tree(text : String, limits : Limits) -> XmlNode raise EafError {
       @xml.Text(s) | @xml.CData(s) =>
         if !stack.is_empty() {
           stack[stack.length() - 1].text.write_string(s)
+        } else {
+          guard xml_space(s) else { raise Xml("text outside root") }
         }
       @xml.DocType(_) => raise Unsupported("DTD")
       @xml.Decl(encoding~, ..) =>
@@ -111,22 +111,12 @@ fn leaf(n : XmlNode) -> Unit raise EafError {
 }
 
 ///|
-fn parse_milliseconds(s : String) -> Int32 raise EafError {
-  guard !s.is_empty() && s.length() <= 10 else {
-    raise Invalid("invalid millisecond number")
+fn parse_milliseconds(s : String) -> Int64 raise EafError {
+  let value = parse_signed_milliseconds(s)
+  guard value >= 0L && value <= 4294967295L else {
+    raise Invalid("TIME_VALUE outside xsd:unsignedInt")
   }
-  let mut n = 0
-  for c in s.to_array() {
-    guard c >= '0' && c <= '9' else {
-      raise Invalid("nondecimal millisecond value")
-    }
-    let digit = c.to_int() - 48
-    guard n <= (2147483647 - digit) / 10 else {
-      raise Invalid("millisecond overflow")
-    }
-    n = n * 10 + digit
-  }
-  n
+  value
 }
 
 ///|
@@ -154,24 +144,89 @@ fn parse_boolean(value : String) -> Bool raise EafError {
 }
 
 ///|
-fn parse_signed_milliseconds(value : String) -> Int32 raise EafError {
-  let cs = value.to_array()
+fn parse_signed_milliseconds(value : String) -> Int64 raise EafError {
+  let cs = schema_token(value).to_array()
   guard !cs.is_empty() else { raise Invalid("empty signed time") }
   let negative = cs[0] == '-'
   let start = if negative || cs[0] == '+' { 1 } else { 0 }
-  guard start < cs.length() && cs.length() - start <= 10 else {
-    raise Invalid("invalid signed time")
+  guard start < cs.length() else { raise Invalid("invalid signed time") }
+  // Accumulate negatively so MIN_INT64 is representable without negation overflow.
+  let limit = if negative {
+    -9223372036854775808L
+  } else {
+    -9223372036854775807L
   }
   let mut n = 0L
   for i = start; i < cs.length(); i = i + 1 {
     guard cs[i].is_ascii_digit() else {
       raise Invalid("nondecimal signed time")
     }
-    n = n * 10L + (cs[i].to_int() - 48).to_int64()
+    let digit = (cs[i].to_int() - 48).to_int64()
+    guard n >= limit / 10L else { raise Invalid("signed time overflow") }
+    n *= 10L
+    guard n >= limit + digit else { raise Invalid("signed time overflow") }
+    n -= digit
   }
-  let n = if negative { -n } else { n }
-  guard n >= -2147483648L && n <= 2147483647L else {
-    raise Invalid("signed time overflow")
+  if negative {
+    n
+  } else {
+    -n
   }
-  n.to_int()
+}
+
+///|
+fn xml_space(value : String) -> Bool {
+  for c in value.to_array() {
+    if c != ' ' && c != '\t' && c != '\r' && c != '\n' {
+      return false
+    }
+  }
+  true
+}
+
+///|
+fn markup_at(cs : Array[Char], pos : Int32, token : Array[Char]) -> Bool {
+  if pos + token.length() > cs.length() {
+    return false
+  }
+  for i, c in token {
+    if cs[pos + i] != c {
+      return false
+    }
+  }
+  true
+}
+
+///|
+/// Refuse declarations BEFORE the XML reader can expand them, not literals in
+/// comments, CDATA or processing instructions. Input is already size-budgeted.
+fn reject_dtd(text : String) -> Unit raise EafError {
+  let cs = text.to_array()
+  let openers = ["<!--".to_array(), "<![CDATA[".to_array(), "<?".to_array()]
+  let closers = ["-->".to_array(), "]]>".to_array(), "?>".to_array()]
+  let dtd = "<!DOCTYPE".to_array()
+  let entity = "<!ENTITY".to_array()
+  let mut pos = 0
+  while pos < cs.length() {
+    let mut skipped = false
+    for i, opener in openers {
+      if markup_at(cs, pos, opener) {
+        pos += opener.length()
+        while pos < cs.length() && !markup_at(cs, pos, closers[i]) {
+          pos += 1
+        }
+        guard pos < cs.length() else { raise Xml("unterminated XML literal") }
+        pos += closers[i].length()
+        skipped = true
+        break
+      }
+    }
+    if skipped {
+      continue
+    }
+    guard !markup_at(cs, pos, dtd) && !markup_at(cs, pos, entity) else {
+      raise Unsupported("DTD and entity declarations")
+    }
+    pos += 1
+  }
 }

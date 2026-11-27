@@ -50,3 +50,5 @@ jobs:
           python -m pip install -r scripts/requirements-oracle.txt
           python scripts/verify_interop.py --target ${{ matrix.target }}
           python scripts/verify_compatibility.py --target ${{ matrix.target }}
+          python scripts/verify_conformance.py --target ${{ matrix.target }}
+          python scripts/build_eaf30_rules.py _build/oracle-schemas/eaf3.0.xsd --check

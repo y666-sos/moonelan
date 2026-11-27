@@ -14,7 +14,7 @@ def require(ok, message):
 
 def metrics():
     files = sorted(p for p in ROOT.glob('*.mbt')
-                   if not p.name.endswith(('_test.mbt', '_wbtest.mbt', '_bbtest.mbt')))
+                   if p.name != 'eaf30_generated.mbt' and not p.name.endswith(('_test.mbt', '_wbtest.mbt', '_bbtest.mbt')))
     result = []
     for path in files:
         lines = path.read_text(encoding='utf-8-sig').splitlines()
@@ -32,14 +32,14 @@ def main():
                  'scripts/requirements-oracle.txt', 'scripts/verify_interop.py'):
         require((ROOT / path).is_file(), 'Missing required artifact: ' + path)
     manifest = (ROOT / 'moon.mod').read_text(encoding='utf-8-sig')
-    for field, expected in [('name', 'y666-sos/moonelan'), ('version', '0.2.0'),
+    for field, expected in [('name', 'y666-sos/moonelan'), ('version', '0.3.0'),
                             ('license', 'MIT'), ('readme', 'README.md'),
                             ('repository', 'https://github.com/y666-sos/moonelan')]:
         require(re.search(r'^' + field + r'\s*=\s*"' + re.escape(expected) + '"',
                           manifest, re.M), 'Manifest mismatch: ' + field)
     readme = (ROOT / 'README.md').read_text(encoding='utf-8-sig')
     require(len(re.findall(r'[\u4e00-\u9fff]', readme)) > 600, 'Chinese README incomplete')
-    require('y666-sos/moonelan@0.2.0' in readme, 'README version missing')
+    require('y666-sos/moonelan@0.3.0' in readme, 'README version missing')
     for page in [ROOT / 'README.md', *sorted((ROOT / 'docs').rglob('*.md'))]:
         text = page.read_text(encoding='utf-8-sig')
         for link in re.findall(r'\]\(([^)]+)\)', text):
@@ -47,7 +47,7 @@ def main():
                 continue
             require((page.parent / link.split('#')[0]).is_file(),
                     'Broken local link in ' + page.name + ': ' + link)
-    for name in ('curate', 'edit', 'dataset', 'oracle', 'compatibility', 'foreign'):
+    for name in ('curate', 'edit', 'dataset', 'oracle', 'compatibility', 'foreign', 'conformance'):
         require((ROOT / 'examples' / name / 'main.mbt').is_file(), 'Missing workflow: ' + name)
     tests = sum(len(re.findall(r'^test\s', p.read_text(encoding='utf-8-sig'), re.M))
                 for p in ROOT.glob('*_wbtest.mbt'))

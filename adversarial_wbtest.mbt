@@ -76,7 +76,7 @@ test "XML adversarial cases and resource boundaries fail through typed errors" {
   let valid = write(sample_document())
   let cases = [
     valid.replace(old="TIME_VALUE=\"1000\"", new="TIME_VALUE=\"-1\""),
-    valid.replace(old="TIME_VALUE=\"1000\"", new="TIME_VALUE=\"2147483648\""),
+    valid.replace(old="TIME_VALUE=\"1000\"", new="TIME_VALUE=\"4294967296\""),
     valid.replace(old="TIME_VALUE=\"1000\"", new="TIME_VALUE=\"1.0\""),
     valid.replace(old="<HEADER", new="<HEADER X=\"unsupported\""),
     valid.replace(old="<TIME_SLOT", new="<TIME_SLOT CV_ENTRY_REF=\"x\""),
@@ -115,12 +115,14 @@ test "deterministic transaction sequences preserve invariants and input ownershi
     let id = "utterance_" + i.to_string()
     let d = rename_annotation(original, "a1", id)
     let d = set_value(d, "a2", "label \{i} & 中文")
-    let d = resample(d, i, 1, offset=i)
+    let d = resample(d, i, 1, offset=i.to_int64())
     let d = select_tiers(d, ["gloss", "words"])
     let d = extract_roots(d, [id])
-    assert_eq(parse(write(d)), d)
-    assert_eq(resolve(d, "a2").start, i)
-    assert_eq(resolve(d, "a2").end, 1000 * i + i)
+    let parsed = parse(write(d))
+    assert_eq({ ..parsed, extensions: d.extensions, }, d)
+    assert_eq(write(parsed), write(d))
+    assert_eq(resolve(d, "a2").start, i.to_int64())
+    assert_eq(resolve(d, "a2").end, (1000 * i + i).to_int64())
     assert_eq(original, subdivided_document())
   }
 }

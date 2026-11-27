@@ -1,12 +1,12 @@
 ///|
 /// Resample the entire timeline using a positive rational scale and signed offset.
 /// Computation uses Int64; integer division floors nonnegative scaled times.
-/// A collapsed interval, negative time or Int32 overflow aborts the transaction.
+/// A collapsed interval, negative time or EAF unsignedInt overflow aborts the transaction.
 pub fn resample(
   d : Document,
   numerator : Int32,
   denominator : Int32,
-  offset~ : Int32 = 0,
+  offset~ : Int64 = 0,
 ) -> Document raise EafError {
   validate(d)
   guard numerator > 0 && denominator > 0 else {
@@ -18,14 +18,15 @@ pub fn resample(
       Some(ms) => ms
       None => continue
     }
-    let value = milliseconds.to_int64() *
-      numerator.to_int64() /
-      denominator.to_int64() +
-      offset.to_int64()
-    guard value >= 0L && value <= 2147483647L else {
+    let value = milliseconds * numerator.to_int64() / denominator.to_int64()
+    guard offset <= 0L || value <= 9223372036854775807L - offset else {
+      raise Invalid("resampled arithmetic overflow")
+    }
+    let value = value + offset
+    guard value >= 0L && value <= 4294967295L else {
       raise Invalid("resampled time out of range")
     }
-    result.times[i] = { ..s, milliseconds: Some(value.to_int()), }
+    result.times[i] = { ..s, milliseconds: Some(value), }
   }
   validate(result)
   result
@@ -40,7 +41,7 @@ pub fn retime(
 ) -> Document raise EafError {
   validate(d)
   let ix = graph_index(d, default_limits())
-  let updates : Map[String, Int32?] = Map([])
+  let updates : Map[String, Int64?] = Map([])
   for s in changes {
     guard ix.times.contains(s.id) else { raise Invalid("unknown time slot") }
     guard !updates.contains(s.id) else { raise Invalid("duplicate time edit") }

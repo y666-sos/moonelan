@@ -141,12 +141,24 @@ fn write_xml(d : Document) -> String raise @xml.WriterError {
       }
     }
   }
-  for
-    c in [TimeSubdivision, IncludedIn, SymbolicAssociation, SymbolicSubdivision] {
-    w.empty_element("CONSTRAINT", [
-      ("STEREOTYPE", constraint_name(c)),
-      ("DESCRIPTION", constraint_name(c)),
-    ])
+  let declared = d.extensions.elements.filter(fn(e) { e.name == "CONSTRAINT" })
+  if declared.is_empty() {
+    for
+      c in [
+        TimeSubdivision,
+        IncludedIn,
+        SymbolicAssociation,
+        SymbolicSubdivision,
+      ] {
+      w.empty_element("CONSTRAINT", [
+        ("STEREOTYPE", constraint_name(c)),
+        ("DESCRIPTION", constraint_name(c)),
+      ])
+    }
+  } else {
+    for e in declared {
+      write_element(w, e)
+    }
   }
   for
     name in [

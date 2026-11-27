@@ -216,6 +216,7 @@ pub fn parse(
         leaf(n)
         structural(n)
         ignore(parse_constraint(required(n, "STEREOTYPE")))
+        extensions.elements.push(import_element(n))
       }
       "LICENSE"
       | "LOCALE"

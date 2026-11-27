@@ -15,6 +15,11 @@ test "EAF writer roundtrips references metadata and XML-sensitive Unicode" {
     ],
   }
   let text = write(d)
-  assert_eq(parse(text), d)
+  let parsed = parse(text)
+  assert_eq({ ..parsed, extensions: d.extensions, }, d)
+  assert_true(
+    parsed.extensions.elements.filter(fn(e) { e.name == "CONSTRAINT" }).length() ==
+    4,
+  )
   assert_eq(write(parse(text)), text)
 }

@@ -137,8 +137,8 @@ pub fn corpus_records(d : Document) -> Array[CorpusRecord] raise EafError {
 /// Select resolved rows in one half-open time window, including symbolic labels.
 pub fn rows_between(
   d : Document,
-  start : Int32,
-  end : Int32,
+  start : Int64,
+  end : Int64,
 ) -> Array[CorpusRow] raise EafError {
   guard start >= 0 && end > start else {
     raise Invalid("invalid row time window")

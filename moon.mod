@@ -1,6 +1,6 @@
 name = "y666-sos/moonelan"
 
-version = "0.2.0"
+version = "0.3.0"
 
 readme = "README.md"
 
@@ -10,7 +10,7 @@ license = "MIT"
 
 keywords = [ "elan", "eaf", "annotation", "corpus", "linguistics" ]
 
-description = "ELAN EAF hierarchy validation, reference-preserving edits and aligned corpus extraction"
+description = "EAF 3.0 structured interchange, vocabulary-aware edits and hierarchy-based corpus extraction"
 
 preferred_target = "wasm-gc"
 

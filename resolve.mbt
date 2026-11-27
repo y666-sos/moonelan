@@ -1,7 +1,7 @@
 ///|
 pub(all) struct Span {
-  start : Int32
-  end : Int32
+  start : Int64
+  end : Int64
 } derive(Debug, Eq)
 
 ///|
@@ -72,8 +72,8 @@ pub fn reference_path(
 pub fn annotations_between(
   d : Document,
   tier : String,
-  start : Int32,
-  end : Int32,
+  start : Int64,
+  end : Int64,
 ) -> Array[Annotation] raise EafError {
   guard start >= 0 && end > start else {
     raise Invalid("invalid query interval")

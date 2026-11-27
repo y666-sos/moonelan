@@ -14,7 +14,7 @@ pub fn annotation_timing(Document, String) -> Timing raise EafError
 
 pub fn annotation_value(Annotation) -> String
 
-pub fn annotations_between(Document, String, Int32, Int32) -> Array[Annotation] raise EafError
+pub fn annotations_between(Document, String, Int64, Int64) -> Array[Annotation] raise EafError
 
 pub fn children(Document, String, String) -> Array[Annotation] raise EafError
 
@@ -28,11 +28,27 @@ pub fn corpus_rows(Document) -> Array[CorpusRow] raise EafError
 
 pub fn default_limits() -> Limits
 
+pub fn document_file(Document) -> EafFile raise EafError
+
 pub fn empty_document() -> Document
 
 pub fn empty_extensions() -> Extensions
 
 pub fn extract_roots(Document, Array[String]) -> Document raise EafError
+
+pub fn file_cv_value(EafFile, String, String, String, resource? : EafFile?) -> String raise EafError
+
+pub fn file_document(EafFile, limits? : Limits) -> Document raise EafError
+
+pub fn file_rename_annotation(EafFile, String, String) -> EafFile raise EafError
+
+pub fn file_select_cv(EafFile, String, String, String, resource? : EafFile?) -> EafFile raise EafError
+
+pub fn file_set_time(EafFile, String, Int64?) -> EafFile raise EafError
+
+pub fn file_set_value(EafFile, String, String) -> EafFile raise EafError
+
+pub fn file_validate_vocabularies(EafFile, resources? : Array[EafFile]) -> Unit raise EafError
 
 pub fn insert_reference(Document, String, String, String, String, after? : String?) -> Document raise EafError
 
@@ -43,6 +59,8 @@ pub fn is_time_alignable(Constraint) -> Bool
 pub fn parent_annotation(Document, String) -> String? raise EafError
 
 pub fn parse(String, limits? : Limits) -> Document raise EafError
+
+pub fn parse_file(String, limits? : Limits) -> EafFile raise EafError
 
 pub fn reference_path(Document, String) -> Array[String] raise EafError
 
@@ -56,13 +74,13 @@ pub fn rename_tier(Document, String, String) -> Document raise EafError
 
 pub fn replace_annotations(Document, String, Array[Annotation], times? : Array[TimeSlot]) -> Document raise EafError
 
-pub fn resample(Document, Int32, Int32, offset? : Int32) -> Document raise EafError
+pub fn resample(Document, Int32, Int32, offset? : Int64) -> Document raise EafError
 
 pub fn resolve(Document, String) -> Span raise EafError
 
 pub fn retime(Document, Array[TimeSlot]) -> Document raise EafError
 
-pub fn rows_between(Document, Int32, Int32) -> Array[CorpusRow] raise EafError
+pub fn rows_between(Document, Int64, Int64) -> Array[CorpusRow] raise EafError
 
 pub fn select_tiers(Document, Array[String]) -> Document raise EafError
 
@@ -82,6 +100,8 @@ pub fn to_json(Document) -> String raise EafError
 
 pub fn validate(Document, limits? : Limits) -> Unit raise EafError
 
+pub fn validate_file(EafFile, limits? : Limits) -> Unit raise EafError
+
 pub fn validate_identifier(String) -> Unit raise EafError
 
 pub fn validate_structure(Document, limits? : Limits) -> Unit raise EafError
@@ -91,6 +111,8 @@ pub fn validate_temporal(Document) -> Unit raise EafError
 pub fn vocabulary_choices(Document, String, String) -> Array[VocabularyChoice] raise EafError
 
 pub fn write(Document) -> String raise EafError
+
+pub fn write_file(EafFile, limits? : Limits) -> String raise EafError
 
 // Errors
 pub(all) suberror EafError {
@@ -167,6 +189,13 @@ pub fn Document::equal(Self, Self) -> Bool
 pub fn Document::not_equal(Self, Self) -> Bool
 pub fn Document::to_repr(Self) -> @debug.Repr
 
+pub(all) struct EafFile {
+  root : Element
+} derive(Eq, @debug.Debug)
+pub fn EafFile::equal(Self, Self) -> Bool
+pub fn EafFile::not_equal(Self, Self) -> Bool
+pub fn EafFile::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Element {
   name : String
   attributes : Array[(String, String)]
@@ -213,7 +242,7 @@ pub(all) struct Media {
   url : String
   relative_url : String
   mime_type : String
-  time_origin : Int32
+  time_origin : Int64
 } derive(Eq, @debug.Debug)
 pub fn Media::equal(Self, Self) -> Bool
 pub fn Media::not_equal(Self, Self) -> Bool
@@ -228,8 +257,8 @@ pub fn ObjectAttributes::not_equal(Self, Self) -> Bool
 pub fn ObjectAttributes::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Span {
-  start : Int32
-  end : Int32
+  start : Int64
+  end : Int64
 } derive(Eq, @debug.Debug)
 pub fn Span::equal(Self, Self) -> Bool
 pub fn Span::not_equal(Self, Self) -> Bool
@@ -249,15 +278,15 @@ pub fn Tier::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TimeSlot {
   id : String
-  milliseconds : Int32?
+  milliseconds : Int64?
 } derive(Eq, @debug.Debug)
 pub fn TimeSlot::equal(Self, Self) -> Bool
 pub fn TimeSlot::not_equal(Self, Self) -> Bool
 pub fn TimeSlot::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Timing {
-  start_ms : Int32?
-  end_ms : Int32?
+  start_ms : Int64?
+  end_ms : Int64?
 } derive(Eq, @debug.Debug)
 pub fn Timing::equal(Self, Self) -> Bool
 pub fn Timing::not_equal(Self, Self) -> Bool

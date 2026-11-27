@@ -13,7 +13,7 @@ fn main raise {
     #|<LINGUISTIC_TYPE LINGUISTIC_TYPE_ID="tag" TIME_ALIGNABLE="false" CONSTRAINTS="Symbolic_Association" CONTROLLED_VOCABULARY_REF="POS" LEXICON_REF="lex"/>
     #|<LOCALE LANGUAGE_CODE="zh" COUNTRY_CODE="CN"/>
     #|<LANGUAGE LANG_ID="zho" LANG_DEF="https://iso639-3.sil.org/code/zho" LANG_LABEL="中文"/><LANGUAGE LANG_ID="eng" LANG_LABEL="English"/>
-    #|<CONSTRAINT STEREOTYPE="Time_Subdivision"/><CONSTRAINT STEREOTYPE="Symbolic_Association"/>
+    #|<CONSTRAINT STEREOTYPE="Time_Subdivision" DESCRIPTION="Time subdivision"/><CONSTRAINT STEREOTYPE="Symbolic_Association" DESCRIPTION="Symbolic association"/>
     #|<CONTROLLED_VOCABULARY CV_ID="POS"><DESCRIPTION LANG_REF="zho">词性</DESCRIPTION><CV_ENTRY_ML CVE_ID="noun"><CVE_VALUE LANG_REF="zho" DESCRIPTION="类别">名词</CVE_VALUE><CVE_VALUE LANG_REF="eng">noun</CVE_VALUE></CV_ENTRY_ML><CV_ENTRY_ML CVE_ID="verb"><CVE_VALUE LANG_REF="zho">动词</CVE_VALUE><CVE_VALUE LANG_REF="eng">verb</CVE_VALUE></CV_ENTRY_ML></CONTROLLED_VOCABULARY>
     #|<LEXICON_REF LEX_REF_ID="lex" NAME="lexicon" TYPE="test" URL="https://example.org/lex" LEXICON_ID="lex1" LEXICON_NAME="Demo"/>
     #|<REF_LINK_SET LINK_SET_ID="links" LANG_REF="zho"><CROSS_REF_LINK REF_LINK_ID="link1" REF1="根1" REF2="p1" DIRECTIONALITY="unidirectional">association</CROSS_REF_LINK><GROUP_REF_LINK REF_LINK_ID="link2" REFS="link1 w2">group</GROUP_REF_LINK></REF_LINK_SET>

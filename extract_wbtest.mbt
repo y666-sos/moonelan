@@ -4,7 +4,9 @@ test "tier selection retains required ancestors but omits unrelated tiers" {
   let selected = select_tiers(d, ["words"])
   assert_eq(tier_order(selected), ["speech", "words"])
   assert_eq(selected.types.length(), 2)
-  assert_eq(parse(write(selected)), selected)
+  let parsed = parse(write(selected))
+  assert_eq({ ..parsed, extensions: selected.extensions, }, selected)
+  assert_eq(write(parsed), write(selected))
   assert_eq(select_tiers(d, []).tiers.length(), 0)
 }
 

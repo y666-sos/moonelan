@@ -65,7 +65,7 @@ pub fn to_json(d : Document) -> String raise EafError {
 }
 
 ///|
-fn optional_ms(value : Int32?) -> String {
+fn optional_ms(value : Int64?) -> String {
   match value {
     Some(ms) => ms.to_string()
     None => ""
@@ -73,9 +73,9 @@ fn optional_ms(value : Int32?) -> String {
 }
 
 ///|
-fn optional_json_ms(value : Int32?) -> Json {
+fn optional_json_ms(value : Int64?) -> Json {
   match value {
-    Some(ms) => @json.to_json(ms)
+    Some(ms) => Json::number(ms.to_double())
     None => null
   }
 }

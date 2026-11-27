@@ -2,7 +2,7 @@
 priv struct GraphIndex {
   tiers : Map[String, Int32]
   types : Map[String, Constraint]
-  times : Map[String, Int32?]
+  times : Map[String, Int64?]
   annotations : Map[String, (Int32, Int32)]
   order : Array[Int32]
 }
@@ -33,7 +33,7 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
   }
   let tiers : Map[String, Int32] = Map([])
   let types : Map[String, Constraint] = Map([])
-  let times : Map[String, Int32?] = Map([])
+  let times : Map[String, Int64?] = Map([])
   let annotations : Map[String, (Int32, Int32)] = Map([])
   for t in d.types {
     validate_identifier(t.id)
@@ -47,7 +47,9 @@ fn graph_index(d : Document, limits : Limits) -> GraphIndex raise EafError {
     guard !xml_ids.contains(s.id) else { raise Invalid("XML ID collision") }
     xml_ids[s.id] = true
     if s.milliseconds is Some(ms) {
-      guard ms >= 0 else { raise Invalid("negative time slot") }
+      guard ms >= 0L && ms <= 4294967295L else {
+        raise Invalid("negative time slot")
+      }
     }
     guard !times.contains(s.id) else { raise Invalid("duplicate time slot") }
     times[s.id] = s.milliseconds

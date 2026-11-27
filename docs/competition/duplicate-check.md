@@ -61,3 +61,9 @@
 行为基线为固定上游提交的 EAF XSD 和 pympi-ling 1.70.2；测试输入由程序合成，不复制第三方语料。每目标 40 文档 / 880 标注，与 XSD、独立解析器、时间公式和标准 CSV 读取器比对。见 PROVENANCE.md 和 scripts/verify_interop.py。
 
 注册表已在固定排他锁内预留和登记外部检查；完成状态只在公开发布和全新消费者验证通过后更新。结论为“已检查的公开结果中未确认 EAF 图核心的直接替代项”，不是全生态唯一性证明或官方验收保证。
+
+## 2026-11-27 发布前复查
+
+在本次修订发布前重新查询 MoonCakes（每条 limit 100）：EAF 和 ELAN 均仅返回本项目的 0.2.0；pympi、annotation graph、controlled vocabulary 返回的其它结果分别为名称模糊匹配、GraphQL/通用图工具、协议字段等相邻能力，未显示可直接替代 EAF 3.0 文件校验、引用安全编辑与词表工作流的实现。GitHub 仓库检索 `EAF language:MoonBit`、`ELAN language:MoonBit` 各返回本仓库一项，incomplete_results=false。此次增强仍延续原项目能力，不创建另一个同核心项目。
+
+上述是有时间和查询边界的复查，不覆盖未索引或私有项目，也不把搜索未命中作为绝对唯一性结论。通用 XML 库是底层依赖而非 EAF 校验与图编辑的直接替代；成熟 ELAN/pympi 是格式和互操作参考，不是 MoonBit 同生态重复实现。

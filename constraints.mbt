@@ -18,7 +18,7 @@ fn temporal_parents(
         spans.get(annotation_id(b)).unwrap().start,
       )
     })
-    let mut last_end = -1
+    let mut last_end = -1L
     for a in ordered {
       let s = spans.get(annotation_id(a)).unwrap()
       guard s.start >= last_end else {

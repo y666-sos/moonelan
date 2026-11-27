@@ -46,3 +46,11 @@
 | 44be1e1 | docs: specify Chinese usage semantic boundaries and source licenses | `LICENSE`, `PROVENANCE.md`, `README.md`, `docs/design.md`, `examples/curate/pkg.generated.mbti`, `examples/dataset/pkg.generated.mbti`, `examples/edit/pkg.generated.mbti`, `examples/fixture/pkg.generated.mbti`, `examples/oracle/pkg.generated.mbti`, `pkg.generated.mbti` | fmt / strict check / tests / source and documentation review |
 | 5bc370f | docs: record multi-domain selection and source-level semantic duplication checks | `docs/competition/duplicate-check.md` | fmt / strict check / tests / source and documentation review |
 | 490caf0 | ci: enforce source history and four-backend interoperability gates | `.github/workflows/ci.yml`, `scripts/check_project.py` | fmt / strict check / tests / project gate; remote CI required |
+
+## 0.3.0 修订门禁
+
+本次以 EAF 3.0 文件模型为明确终点，具体需求映射和独立验证方法见 [符合性验证](conformance-0.3.0.md)。实测 22 个非生成生产文件、3,902 物理行、3,478 实质行；不计生成规则、测试、示例、依赖、配置和接口。45 个 MoonBit 测试；新独立矩阵 110 个合法案例、79 个非法案例，覆盖 27 元素/98 属性；另外保留 40 文档/880 标注和 16 组/64 标注回归以及外部生成输入。
+
+本地 wasm-gc/wasm/js 执行严格检查、测试、构建、七个用户示例及三套独立 Python 检查。native 实际执行由 Linux CI 验收，不能用本地静态检查代替。发布需要精确提交的四目标实际 CI 全绿、标签/Release 对齐、真实包隐私检查、MoonCakes 精确版本公开可读及全新无凭据消费者通过；这些门禁通过前不算完成交付。
+
+原有效历史计数 21 仍作为保守下界。本次格式模型、时间升级、矩阵和文档整体修订承担同一个完整能力，不拆分提交凑数。申报资料保持在仓库外，不作为代码、包或 Release 附件上传。

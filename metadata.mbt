@@ -1,6 +1,5 @@
 ///|
-/// The portable ID subset deliberately excludes colon and non-ASCII characters.
-/// Tier and linguistic-type labels may still contain Unicode.
+/// XML 1.0 NCNames, including non-ASCII identifiers; colon is not an ID character.
 fn validate_xml_id(id : String) -> Unit raise EafError {
   let cs = id.to_array()
   guard !cs.is_empty() else { raise Invalid("empty XML ID") }
@@ -69,33 +68,41 @@ fn date_number(
 }
 
 ///|
-/// Accept four-digit Gregorian dateTimes, fractional seconds and explicit zones.
-/// Leap seconds and 24:00 are rejected, keeping cross-runtime behavior uniform.
+/// XML Schema 1.0 Gregorian dateTime lexical space without bounded year conversion.
 fn validate_date(value : String) -> Unit raise EafError {
   let cs = value.to_array()
-  guard cs.length() >= 19 else { raise Invalid("DATE requires ISO dateTime") }
-  guard cs[4] == '-' &&
-    cs[7] == '-' &&
-    cs[10] == 'T' &&
-    cs[13] == ':' &&
-    cs[16] == ':' else {
+  let start = if !cs.is_empty() && cs[0] == '-' { 1 } else { 0 }
+  let mut yend = start
+  let mut year = 0
+  let mut nonzero = false
+  while yend < cs.length() && cs[yend].is_ascii_digit() {
+    let digit = cs[yend].to_int() - 48
+    year = (year * 10 + digit) % 400
+    nonzero = nonzero || digit != 0
+    yend += 1
+  }
+  guard yend - start >= 4 &&
+    nonzero &&
+    (yend - start == 4 || cs[start] != '0') &&
+    cs.length() >= yend + 15 else {
+    raise Invalid("DATE year")
+  }
+  guard cs[yend] == '-' &&
+    cs[yend + 3] == '-' &&
+    cs[yend + 6] == 'T' &&
+    cs[yend + 9] == ':' &&
+    cs[yend + 12] == ':' else {
     raise Invalid("DATE separators")
   }
-  let year = date_number(cs, 0, 4)
-  let month = date_number(cs, 5, 2)
-  let day = date_number(cs, 8, 2)
-  let hour = date_number(cs, 11, 2)
-  let minute = date_number(cs, 14, 2)
-  let second = date_number(cs, 17, 2)
-  guard year > 0 &&
-    month >= 1 &&
-    month <= 12 &&
-    hour < 24 &&
-    minute < 60 &&
-    second < 60 else {
+  let month = date_number(cs, yend + 1, 2)
+  let day = date_number(cs, yend + 4, 2)
+  let hour = date_number(cs, yend + 7, 2)
+  let minute = date_number(cs, yend + 10, 2)
+  let second = date_number(cs, yend + 13, 2)
+  guard month >= 1 && month <= 12 && hour <= 24 && minute < 60 && second < 60 else {
     raise Invalid("DATE field range")
   }
-  let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+  let leap = year % 4 == 0 && (year % 100 != 0 || year == 0)
   let days = [
     31,
     if leap {
@@ -117,14 +124,19 @@ fn validate_date(value : String) -> Unit raise EafError {
   guard day >= 1 && day <= days[month - 1] else {
     raise Invalid("DATE day range")
   }
-  let mut pos = 19
+  let mut pos = yend + 15
+  let mut fraction_nonzero = false
   if pos < cs.length() && cs[pos] == '.' {
     pos += 1
     let begin = pos
     while pos < cs.length() && cs[pos].is_ascii_digit() {
+      fraction_nonzero = fraction_nonzero || cs[pos] != '0'
       pos += 1
     }
     guard pos > begin else { raise Invalid("DATE empty fraction") }
+  }
+  guard hour != 24 || (minute == 0 && second == 0 && !fraction_nonzero) else {
+    raise Invalid("DATE end of day")
   }
   if pos == cs.length() {
     return

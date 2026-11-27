@@ -6,7 +6,7 @@ fn main raise {
     let d = @eaf.set_value(
       d, "tr0", "Translation \"quoted\", 中文\nsecond line",
     )
-    let d = @eaf.resample(d, 3, 2, offset=seed)
+    let d = @eaf.resample(d, 3, 2, offset=seed.to_int64())
     let d = @eaf.parse(@eaf.write(d))
     println(@eaf.write(d))
     println("MOONELAN_XML_END")
